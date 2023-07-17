@@ -1,0 +1,27 @@
+version: '3'
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  docker-soketi:
+    image: 'quay.io/soketi/soketi:1.5.0-16-debian'
+#    environment:
+#      SOKETI_DEBUG: '1'
+#      SOKETI_METRICS_SERVER_PORT: '9601'
+#      SOKETI_DEFAULT_APP_ID: '12345'
+#      SOKETI_DEFAULT_APP_KEY: 'ABCDEFG'
+#      SOKETI_DEFAULT_APP_SECRET: 'HIJKLMNOP'
+    command: ["node", "/app/bin/server.js", "start", "--config=/app/config.json"]
+    volumes:
+#      - ./data/app:/app
+#      - ./data/app:/backup
+#      - ./data/.env:/app/.env
+      - ./data/config.json:/app/config.json
+    ports:
+      - '6001:6001'
+      - '9601:9601'
+    networks:
+      - server_web-network
