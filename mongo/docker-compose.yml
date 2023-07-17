@@ -1,0 +1,28 @@
+version: '3.8'
+
+networks:
+  web-network:
+
+services:
+  docker-mongo:
+    image: mongo:5.0.5
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    ports:
+      - "27017:27017" #为了在宿主机使用vs code连接mongo
+    volumes:
+      - ./data:/data/db
+    networks:
+      - web-network
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8091:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://docker-mongo
+    networks:
+      - web-network
