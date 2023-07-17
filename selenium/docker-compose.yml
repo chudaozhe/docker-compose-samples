@@ -1,0 +1,26 @@
+version: "3"
+services:
+  selenium-hub:
+    image: selenium/hub:4.1.4-20220427
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+
+  chrome:
+#    selenium/node-edge:4.1.4-20220427
+#    selenium/node-firefox:4.1.4-20220427
+    image: selenium/node-chrome:4.1.4-20220427
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - VNC_VIEW_ONLY=1 #查看模式
+      - VNC_NO_PASSWORD=1 #取消密码验证
+    ports:
+      - "7900:7900"
+      - "5900:5900"
