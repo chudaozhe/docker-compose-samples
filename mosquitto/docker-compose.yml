@@ -1,0 +1,40 @@
+version: '3'
+
+networks:
+  web-network:
+
+services:
+  docker-mosquitto:
+    image: eclipse-mosquitto:2.0.14
+    hostname: mosquitto
+    restart: always
+    tty: true
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/log:/mosquitto/log
+      - ./mosquitto/data:/mosquitto/data
+    ports:
+      - 1883:1883
+      - 8883:8883
+      - 15675:15675
+      - 15676:15676
+    networks:
+      - web-network
+
+  # mosquitto的web管理后台
+  # 通过http://localhost:8088/访问
+  docker-management-center:
+    image: cedalo/management-center:2.4.2
+    restart: always
+    environment:
+      CEDALO_MC_BROKER_ID: mosquitto
+      CEDALO_MC_BROKER_NAME: Mosquitto
+      CEDALO_MC_BROKER_URL: mqtt://docker-mosquitto:1883
+      CEDALO_MC_BROKER_USERNAME: cw
+      CEDALO_MC_BROKER_PASSWORD: 123456
+      CEDALO_MC_USERNAME: "admin"
+      CEDALO_MC_PASSWORD: "12345"
+    ports:
+      - 8088:8088
+    networks:
+      - web-network
