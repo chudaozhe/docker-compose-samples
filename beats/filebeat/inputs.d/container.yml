@@ -1,0 +1,10 @@
+#------------------------------ Container input --------------------------------
+- type: container
+  enabled: true
+
+  # Paths for container logs that should be crawled and fetched.
+  paths:
+    - /var/lib/docker/containers/*/*.log
+
+  # Configure stream to filter to a specific stream: stdout, stderr or all (default)
+  #stream: all

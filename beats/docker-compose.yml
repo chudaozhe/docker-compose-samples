@@ -1,0 +1,114 @@
+version: '3'
+
+networks:
+  web-network:
+
+services:
+
+  filebeat:
+    image: elastic/filebeat:7.17.0
+    container_name: filebeat
+    user: root #收集容器日志时才需要
+    restart: always
+    tty: true
+    environment:
+      - ELASTICSEARCH_HOSTS=["elasticsearch:9200"]
+#      - ELASTICSEARCH_USERNAME="admin"
+#      - ELASTICSEARCH_PASSWORD="123"
+    volumes:
+      - ../apps/filebeat/data:/usr/share/filebeat/data
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/modules.d/nginx.yml:/usr/share/filebeat/modules.d/nginx.yml
+      - ./filebeat/inputs.d:/usr/share/filebeat/inputs.d
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ../log/nginx:/var/log/nginx
+    networks:
+      - web-network
+
+  metricbeat:
+# https://www.elastic.co/guide/en/beats/metricbeat/current/running-on-docker.html
+#部分特性仅linux支持
+    image: elastic/metricbeat:7.17.0
+    container_name: metricbeat
+    user: root
+    restart: always
+    tty: true
+    environment:
+      - ELASTICSEARCH_HOSTS=["elasticsearch:9200"]
+    #      - ELASTICSEARCH_USERNAME="admin"
+    #      - ELASTICSEARCH_PASSWORD="123"
+    command: [ "--strict.perms=false", "-system.hostfs=/hostfs" ]
+    cap_add:
+      - SYS_PTRACE
+      - DAC_READ_SEARCH
+    volumes:
+      - ../apps/metricbeat/data:/usr/share/metricbeat/data
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - ./metricbeat/modules.d/system.yml:/usr/share/metricbeat/modules.d/system.yml
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - web-network
+
+  packetbeat:
+# https://www.elastic.co/guide/en/beats/packetbeat/current/running-on-docker.html
+# 不同系统会有区别
+    image: elastic/packetbeat:7.17.0
+    container_name: packetbeat
+    restart: always
+    tty: true
+    environment:
+      - ELASTICSEARCH_HOSTS=["elasticsearch:9200"]
+    #      - ELASTICSEARCH_USERNAME="admin"
+    #      - ELASTICSEARCH_PASSWORD="123"
+    command: [ "--strict.perms=false" ]
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ../apps/packetbeat/data:/usr/share/packetbeat/data
+      - ./packetbeat/packetbeat.yml:/usr/share/packetbeat/packetbeat.yml
+    networks:
+      - web-network
+
+  auditbeat:
+# https://www.elastic.co/guide/en/beats/auditbeat/current/running-on-docker.html
+    image: elastic/auditbeat:7.17.0
+    container_name: auditbeat
+    user: root
+    restart: always
+    tty: true
+    environment:
+      - ELASTICSEARCH_HOSTS=["elasticsearch:9200"]
+    #      - ELASTICSEARCH_USERNAME="admin"
+    #      - ELASTICSEARCH_PASSWORD="123"
+    pid: host
+    command: [ "--strict.perms=false" ]
+    cap_add:
+      - AUDIT_CONTROL
+      - AUDIT_READ
+    volumes:
+      - ../apps/auditbeat/data:/usr/share/auditbeat/data
+      - ./auditbeat/auditbeat.yml:/usr/share/auditbeat/auditbeat.yml
+    networks:
+      - web-network
+
+  heartbeat:
+# https://www.elastic.co/guide/en/beats/heartbeat/current/running-on-docker.html
+    image: elastic/heartbeat:7.17.0
+    container_name: heartbeat
+    restart: always
+    tty: true
+    environment:
+      - ELASTICSEARCH_HOSTS=["elasticsearch:9200"]
+    #      - ELASTICSEARCH_USERNAME="admin"
+    #      - ELASTICSEARCH_PASSWORD="123"
+    command: [ "--strict.perms=false" ]
+    volumes:
+      - ../apps/heartbeat/data:/usr/share/heartbeat/data
+      - ./heartbeat/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
+      - ./heartbeat/monitors.d/sample.http.yml:/usr/share/heartbeat/monitors.d/sample.http.yml
+    networks:
+      - web-network

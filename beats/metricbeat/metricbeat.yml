@@ -1,0 +1,24 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+processors:
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+
+setup.kibana:
+  host: "kibana:5601"
+
+# kibana 索引模式
+setup.dashboards.index: "logstash-metricbeat*"
+
+#output.elasticsearch:
+#  hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+#  username: '${ELASTICSEARCH_USERNAME:}'
+#  password: '${ELASTICSEARCH_PASSWORD:}'
+
+# ------------------------------ Logstash Output -------------------------------
+output.logstash:
+  enabled: true
+  hosts: ["logstash:5044"]
+#  index: 'filebeat'

@@ -1,0 +1,9 @@
+#------------------------------ Log input 收集nginx日志 --------------------------------
+- type: log
+  enabled: false
+  paths:
+    - /var/log/nginx/access.log
+  # 日志是json开启这个
+  json.keys_under_root: true
+  json.overwrite_keys: true
+  json.add_error_key: true
