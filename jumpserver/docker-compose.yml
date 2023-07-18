@@ -1,0 +1,135 @@
+version: '3'
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  core:
+    image: jumpserver/core:${Version}
+    container_name: jms_core
+    restart: always
+    tty: true
+    command: start web
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
+      LOG_LEVEL: $LOG_LEVEL
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    volumes:
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
+    networks:
+      - server_web-network
+
+  celery:
+    image: jumpserver/core:${Version}
+    container_name: jms_celery
+    restart: always
+    tty: true
+    command: start task
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
+      LOG_LEVEL: $LOG_LEVEL
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    depends_on:
+      core:
+        condition: service_healthy
+    volumes:
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
+    networks:
+      - server_web-network
+
+  koko:
+    image: jumpserver/koko:${Version}
+    container_name: jms_koko
+    restart: always
+    privileged: true
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+      SSHD_PORT: ${SSH_PORT:-2222}
+    depends_on:
+      core:
+        condition: service_healthy
+    volumes:
+      - ${VOLUME_DIR}/koko/data:/opt/koko/data
+    ports:
+      - ${SSH_PORT:-2222}:${SSH_PORT}
+    networks:
+      - server_web-network
+
+  lion:
+    image: jumpserver/lion:${Version}
+    container_name: jms_lion
+    restart: always
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+    depends_on:
+      core:
+        condition: service_healthy
+    volumes:
+      - ${VOLUME_DIR}/lion/data:/opt/lion/data
+    networks:
+      - server_web-network
+
+  magnus:
+    image: jumpserver/magnus:${Version}
+    container_name: jms_magnus
+    restart: always
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+    depends_on:
+      core:
+        condition: service_healthy
+    volumes:
+      - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
+    ports:
+      - 30000-30100:30000-30100
+    networks:
+      - server_web-network
+
+  web:
+    image: jumpserver/web:${Version}
+    container_name: jms_web
+    restart: always
+    tty: true
+    environment:
+      HTTP_PORT: ${HTTP_PORT:-80}
+    depends_on:
+      core:
+        condition: service_healthy
+    volumes:
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/nginx/data/logs:/var/log/nginx
+    ports:
+      - ${HTTP_PORT:-80}:${HTTP_PORT:-80}
+    networks:
+      - server_web-network
