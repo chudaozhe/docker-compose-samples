@@ -1,0 +1,59 @@
+version: '3.8'
+
+networks:
+  web-network:
+
+services:
+  docker-mysql-master:
+    container_name: docker-mysql-master
+    image: mysql:8.0.26
+    restart: always
+#    ports:
+#      - "3306:3306"
+    volumes:
+      - ./master/log:/var/log/mysql
+      - ./master/conf/my.cnf:/etc/my.cnf
+      - ./master/data:/var/lib/mysql
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_general_ci',
+        '--max_connections=3000'
+    ]
+    networks:
+      - web-network
+
+  docker-mysql-slave:
+    container_name: docker-mysql-slave
+    image: mysql:8.0.26
+    restart: always
+#    ports:
+#      - "3307:3306"
+    volumes:
+      - ./slave/log:/var/log/mysql
+      - ./slave/conf/my.cnf:/etc/my.cnf
+      - ./slave/data:/var/lib/mysql
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_general_ci',
+        '--max_connections=3000'
+    ]
+    networks:
+      - web-network
+
+  docker-phpmyadmin:
+    container_name: docker-phpmyadmin
+    image: phpmyadmin:5.1.1
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+    environment:
+#      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=200mb
+    networks:
+      - web-network
