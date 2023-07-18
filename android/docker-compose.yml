@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+
+  android31:
+    image: androidsdk/android-31
+    container_name: android31
+#    user: root
+    restart: always
+    tty: true
+    devices:
+      - "/dev/kvm:/dev/kvm"
+    network_mode: host
