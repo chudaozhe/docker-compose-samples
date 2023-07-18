@@ -1,0 +1,18 @@
+version: '3'
+
+networks:
+  server_web-network:
+    external: true
+
+services:
+  docker-gonb_jupyterlab:
+    image: "janpfeifer/gonb_jupyterlab:v0.6.2"
+    hostname: docker-gonb_jupyterlab
+    restart: always
+    tty: true
+    volumes:
+      - ./data:/home/jovyan/work
+    ports:
+      - "8899:8888"
+    networks:
+      - server_web-network

@@ -1,0 +1,18 @@
+version: '3'
+
+networks:
+  server_web-network:
+    external: true
+
+services:
+  docker-jupyter:
+    image: "jupyter/base-notebook:lab-3.6.3"
+    hostname: docker-jupyter
+    restart: always
+    tty: true
+    volumes:
+      - ./data:/home/jovyan
+    ports:
+      - "8888:8888"
+    networks:
+      - server_web-network
