@@ -1,0 +1,18 @@
+version: '3.1'
+services:
+  jenkins:
+    image: jenkins/jenkins:2.361.4-lts-jdk11
+    volumes:
+      - ./data/jenkins/:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/bin/docker
+      - .ssh:/root/.ssh
+    ports:
+      - "8088:8080"
+#    容器内获取宿主机的root权限
+#    privileged: true
+    user: root # 要不 docker pull 会没权限
+    restart: always
+    container_name: jenkins
+#    environment:
+#      JAVA_OPTS: '-Djava.util.logging.config.file=/var/jenkins_home/log.properties'
