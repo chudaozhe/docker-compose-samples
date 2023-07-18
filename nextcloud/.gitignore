@@ -1,0 +1,10 @@
+/data/log/*/*.log
+
+/data/apps/redis/data
+!/data/apps/redis/data/.gitkeep
+
+/data/apps/postgresql/data
+!/data/apps/postgresql/data/.gitkeep
+
+/data/apps/mariadb/data
+!/data/apps/mariadb/data/.gitkeep

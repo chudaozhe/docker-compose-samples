@@ -1,0 +1,110 @@
+version: '3'
+
+networks:
+  web-network:
+
+volumes:
+  nextcloud:
+
+services:
+  docker-nginx:
+    image: nginx:1.21.3
+    restart: always
+    tty: true
+    volumes:
+      - nextcloud:/var/www/html
+      - ./nginx/conf/fastcgi_params:/etc/nginx/fastcgi_params
+      - ./nginx/conf/conf.d:/etc/nginx/conf.d
+      - ./data/log/nginx:/var/log/nginx
+    ports:
+      - 80:80
+    networks:
+      - web-network
+
+  docker-nextcloud:
+    image: nextcloud:23.0.3-fpm-alpine
+    restart: always
+    tty: true
+    volumes:
+      - ./data/www/backup:/var/www/backup
+      - nextcloud:/var/www/html
+    environment:
+      - REDIS_HOST=docker-redis
+#      - REDIS_HOST_PORT=6379
+#      - REDIS_HOST_PASSWORD=
+      - MYSQL_HOST=docker-mysql
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+#      - POSTGRES_HOST=docker-postgres
+#      - POSTGRES_DB=nextcloud
+#      - POSTGRES_USER=nextcloud
+#      - POSTGRES_PASSWORD=nextcloud
+    networks:
+      - web-network
+
+  cron:
+    image: nextcloud:23.0.3-fpm-alpine
+    restart: always
+    tty: true
+    volumes:
+      - nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    networks:
+      - web-network
+
+  docker-redis:
+    image: redis:6.2.5
+    restart: always
+    tty: true
+    command: redis-server /etc/redis.conf
+    volumes:
+      - ./redis/conf/redis.conf:/etc/redis.conf
+      - ./data/log/redis:/var/log/redis
+      - ./data/apps/redis/data:/var/lib/redis
+    ports:
+      - 6379:6379
+    networks:
+      - web-network
+
+  docker-mysql:
+    image: mariadb:10.5.12
+    hostname: mysql
+    restart: always
+    tty: true
+    volumes:
+      - ./data/apps/mariadb/data:/var/lib/mysql
+      - ./mariadb/conf/my.cnf:/etc/my.cnf
+    environment:
+#      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    ports:
+      - 3306:3306
+    networks:
+      - web-network
+
+  docker-postgres:
+    image: postgres:14.2-alpine
+    restart: always
+    tty: true
+    command: postgres -c config_file='/etc/postgresql/postgresql.conf' -c 'hba_file=/etc/postgresql/pg_hba.conf' -c 'ident_file=/etc/postgresql/pg_ident.conf'
+    volumes:
+      - ./data/apps/postgresql/data:/var/lib/postgresql/data
+      - ./postgresql/conf/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgresql/conf/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./postgresql/conf/pg_ident.conf:/etc/postgresql/pg_ident.conf
+      # 第一次启动时执行导入sql, sql.gz, 执行.sh
+      - ./data/apps/postgresql/source:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=123 #必填
+#      - POSTGRES_DB=postgres #默认postgres
+#      - POSTGRES_USER=postgres #默认postgres
+#      - PGDATA=/var/lib/postgresql/data #默认/var/lib/postgresql/data
+#      - POSTGRES_HOST_AUTH_METHOD=md5 #默认md5
+    ports:
+      - 5432:5432
+    networks:
+      - web-network
