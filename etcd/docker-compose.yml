@@ -1,0 +1,27 @@
+version: '3'
+
+networks:
+  web-network:
+
+services:
+  docker-etcd:
+    hostname: etcd
+    image: bitnami/etcd:3.5.5
+    volumes:
+      - "./data:/bitnami/etcd/data"
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    networks:
+      - web-network
+
+  docker-etcdkeeper:
+    hostname: etcdkeeper
+    image: evildecay/etcdkeeper:v0.7.6
+    ports:
+      - "8099:8080"
+    networks:
+      - web-network
