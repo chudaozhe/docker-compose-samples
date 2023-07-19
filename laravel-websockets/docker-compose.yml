@@ -1,0 +1,17 @@
+version: '3'
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  docker-laravel-websockets:
+    image: 'chudaozhe/php:8.1.9-cli-laravel-websockets-v1.0'
+    volumes:
+      - ./storage:/var/www/app/storage
+      - ./app/.env:/var/www/app/.env
+    ports:
+      - '6001:6001'
+    networks:
+      - server_web-network
