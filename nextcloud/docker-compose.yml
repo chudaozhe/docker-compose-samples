@@ -9,6 +9,7 @@ volumes:
 services:
   docker-nginx:
     image: nginx:1.21.3
+    container_name: docker-nginx
     restart: always
     tty: true
     volumes:
@@ -23,6 +24,7 @@ services:
 
   docker-nextcloud:
     image: nextcloud:23.0.3-fpm-alpine
+    container_name: docker-nextcloud
     restart: always
     tty: true
     volumes:
@@ -43,8 +45,9 @@ services:
     networks:
       - web-network
 
-  cron:
+  docker-cron:
     image: nextcloud:23.0.3-fpm-alpine
+    container_name: docker-cron
     restart: always
     tty: true
     volumes:
@@ -55,6 +58,7 @@ services:
 
   docker-redis:
     image: redis:6.2.5
+    container_name: docker-redis
     restart: always
     tty: true
     command: redis-server /etc/redis.conf
@@ -69,6 +73,7 @@ services:
 
   docker-mysql:
     image: mariadb:10.5.12
+    container_name: docker-mysql
     hostname: mysql
     restart: always
     tty: true
@@ -86,25 +91,26 @@ services:
     networks:
       - web-network
 
-  docker-postgres:
-    image: postgres:14.2-alpine
-    restart: always
-    tty: true
-    command: postgres -c config_file='/etc/postgresql/postgresql.conf' -c 'hba_file=/etc/postgresql/pg_hba.conf' -c 'ident_file=/etc/postgresql/pg_ident.conf'
-    volumes:
-      - ./data/apps/postgresql/data:/var/lib/postgresql/data
-      - ./postgresql/conf/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./postgresql/conf/pg_hba.conf:/etc/postgresql/pg_hba.conf
-      - ./postgresql/conf/pg_ident.conf:/etc/postgresql/pg_ident.conf
-      # 第一次启动时执行导入sql, sql.gz, 执行.sh
-      - ./data/apps/postgresql/source:/docker-entrypoint-initdb.d
-    environment:
-      - POSTGRES_PASSWORD=123 #必填
-#      - POSTGRES_DB=postgres #默认postgres
-#      - POSTGRES_USER=postgres #默认postgres
-#      - PGDATA=/var/lib/postgresql/data #默认/var/lib/postgresql/data
-#      - POSTGRES_HOST_AUTH_METHOD=md5 #默认md5
-    ports:
-      - 5432:5432
-    networks:
-      - web-network
+#  docker-postgres:
+#    image: postgres:14.2-alpine
+#    container_name: docker-postgres
+#    restart: always
+#    tty: true
+#    command: postgres -c config_file='/etc/postgresql/postgresql.conf' -c 'hba_file=/etc/postgresql/pg_hba.conf' -c 'ident_file=/etc/postgresql/pg_ident.conf'
+#    volumes:
+#      - ./data/apps/postgresql/data:/var/lib/postgresql/data
+#      - ./postgresql/conf/postgresql.conf:/etc/postgresql/postgresql.conf
+#      - ./postgresql/conf/pg_hba.conf:/etc/postgresql/pg_hba.conf
+#      - ./postgresql/conf/pg_ident.conf:/etc/postgresql/pg_ident.conf
+#      # 第一次启动时执行导入sql, sql.gz, 执行.sh
+#      - ./postgresql/source:/docker-entrypoint-initdb.d
+#    environment:
+#      - POSTGRES_PASSWORD=123 #必填
+##      - POSTGRES_DB=postgres #默认postgres
+##      - POSTGRES_USER=postgres #默认postgres
+##      - PGDATA=/var/lib/postgresql/data #默认/var/lib/postgresql/data
+##      - POSTGRES_HOST_AUTH_METHOD=md5 #默认md5
+#    ports:
+#      - 5432:5432
+#    networks:
+#      - web-network
