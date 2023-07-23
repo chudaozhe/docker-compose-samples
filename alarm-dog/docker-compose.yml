@@ -1,0 +1,75 @@
+version: "3"
+
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  admin:
+    image: chudaozhe/alarm-dog-admin:1.0.0-v1.0
+#    ports:
+#      - "9501:9501"
+    volumes:
+      - ./alarm-dog-admin/.env:/opt/www/.env
+    networks:
+      - server_web-network
+
+  fe:
+    image: chudaozhe/alarm-dog-fe:1.0.0-v1.0
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+#      - "9505:80"
+    environment:
+      - VUE_APP_STATIC_PREFIX=//127.0.0.1:8081/admin/
+      - VUE_APP_BASE_API=//127.0.0.1:8081/api/
+      - DOG_FE_VERSION=docker-
+      - VUE_APP_FORCE_HTTPS=
+    volumes:
+      - ./docker/fe/nginx/conf.d:/etc/nginx/conf.d:rw
+      - ./docker/fe/nginx/logs:/var/log/nginx:rw
+    networks:
+      - server_web-network
+
+  api:
+#    ports:
+#      - "9502:9501"
+    image: chudaozhe/alarm-dog-api:1.0.0-v1.0
+    volumes:
+      - ./alarm-dog-api/.env:/opt/www/.env
+    networks:
+      - server_web-network
+
+  consumer:
+    image: chudaozhe/alarm-dog-consumer:1.0.0-v1.0
+    volumes:
+      - ./alarm-dog-consumer/.env:/opt/www/.env
+    networks:
+      - server_web-network
+
+  monitor:
+    image: chudaozhe/alarm-dog-monitor:1.0.0-v1.0
+    volumes:
+      - ./alarm-dog-monitor/.env:/opt/www/.env
+    networks:
+      - server_web-network
+
+  clickhouse:
+    image: yandex/clickhouse-server:20.7
+    ports:
+#      - "9090:9090"
+#      - "9009:9009"
+#      - "9000:9000"
+      - "8123:8123"
+    volumes:
+      - ./docker/clickhouse/data:/var/lib/clickhouse:rw
+      - ./alarm-dog-admin/resource/clickhouse.sql:/data/clickhouse.sql:ro
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - server_web-network
