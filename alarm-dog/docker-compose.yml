@@ -22,11 +22,6 @@ services:
       - "8081:8081"
       - "8082:8082"
 #      - "9505:80"
-    environment:
-      - VUE_APP_STATIC_PREFIX=//127.0.0.1:8081/admin/
-      - VUE_APP_BASE_API=//127.0.0.1:8081/api/
-      - DOG_FE_VERSION=docker-
-      - VUE_APP_FORCE_HTTPS=
     volumes:
       - ./docker/fe/nginx/conf.d:/etc/nginx/conf.d:rw
       - ./docker/fe/nginx/logs:/var/log/nginx:rw
