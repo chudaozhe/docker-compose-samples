@@ -1,0 +1,49 @@
+version: '3'
+
+networks:
+  web-network:
+
+services:
+
+  confluence:
+    image: confluence-server:8.5.0-m05-jdk11-1.0
+    container_name: confluence
+    hostname: confluence
+    ports:
+      - "8090:8090"
+    restart: always
+    tty: true
+    volumes:
+      - ./confluence/data:/var/atlassian/application-data/confluence
+      - ./confluence/mysql-connector-j-8.0.31.jar:/opt/atlassian/confluence/confluence/WEB-INF/lib/mysql-connector-j-8.0.31.jar
+    networks:
+      - web-network
+
+  jira-core:
+    image: jira-core:9.4.0-jdk11-1.0
+    container_name: jira-core
+    hostname: jira-core
+    ports:
+      - "8081:8080"
+    restart: always
+    tty: true
+    volumes:
+      - ./jira/data:/var/atlassian/application-data/jira
+      - ./jira/mysql-connector-j-8.0.31.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/mysql-connector-j-8.0.31.jar
+    networks:
+      - web-network
+
+  docker-mysql:
+    image: mysql:8.0.26
+    hostname: mysql
+    restart: always
+    tty: true
+    volumes:
+      - ./mysql/my.cnf:/etc/my.cnf
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+    ports:
+      - 3306:3306
+    networks:
+      - web-network
