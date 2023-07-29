@@ -1,0 +1,73 @@
+version: '3'
+
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  fluentd:
+    image: registry.cn-hangzhou.aliyuncs.com/cuiw/fluentd:v1.9-1
+    container_name: fluentd
+    restart: always
+    tty: true
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+      - ../log/nginx:/var/log/nginx
+    ports:
+      - 9880:9880
+      - 24220:24220
+      - 24224:24224
+      - 24224:24224/udp
+    networks:
+      - server_web-network
+
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    container_name: elasticsearch
+    restart: always
+    tty: true
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - ../apps/elasticsearch/data:/usr/share/elasticsearch/data:rw
+      - ./elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/logs:/usr/share/elasticsearch/logs:rw
+      - ./elasticsearch/backup:/usr/share/elasticsearch/backup:rw
+      - ./elasticsearch/plugins:/usr/share/elasticsearch/plugins:rw
+    ports:
+      - 9200:9200
+    networks:
+      - server_web-network
+
+  kibana:
+    image: kibana:7.17.0
+    container_name: kibana
+    restart: always
+    tty: true
+#    environment:
+#      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+    networks:
+      - server_web-network
+
+  logstash:
+    image: logstash:7.17.0
+    container_name: logstash
+    restart: always
+    tty: true
+    environment:
+      discovery.seed_hosts: logstash
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - 5044:5044
+      - 8099:8099
+    networks:
+      - server_web-network

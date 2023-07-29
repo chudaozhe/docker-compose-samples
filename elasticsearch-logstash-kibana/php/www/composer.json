@@ -1,0 +1,14 @@
+{
+  "repositories": [
+    {"type": "composer", "url": "https://mirrors.aliyun.com/composer"},
+    {"packagist": false}
+  ],
+  "require": {
+    "fluent/logger": "v1.0.1",
+    "elasticsearch/elasticsearch": "^v7.14.0"
+  },
+  "config": {
+    "secure-http": false
+  }
+}
+
