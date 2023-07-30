@@ -1,0 +1,30 @@
+version: '3.3'
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+    ports:
+      - "8200:8200"
+    restart: always
+    volumes:
+      # 审计日志存储目录（`file` audit backend）
+      - ./logs:/vault/logs
+      # 使用文件做数据存储（单节点）
+      - ./file:/vault/file
+      - ./config.hcl:/vault/config/config.hcl
+      # TLS 证书
+      - ./certs:/certs
+    # vault 需要锁定内存以防止敏感值信息被交换(swapped)到磁盘中
+    # 为此需要添加如下 capability
+    cap_add:
+      - IPC_LOCK
+    # 必须设定 entrypoint，否则 vault 容器默认以 development 模式运行
+    entrypoint: vault server -config /vault/config/config.hcl
+    networks:
+      - server_web-network
