@@ -1,0 +1,17 @@
+version: '3'
+
+networks:
+  puppeteer:
+
+services:
+  puppeteer:
+    image: registry.cn-hangzhou.aliyuncs.com/cuiw/puppeteer-chrome-linux:20210916
+    container_name: puppeteer
+    command: bash -c "/usr/local/bin/node /app/server.js"
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data:/app
+    networks:
+      - puppeteer
+#    entrypoint: ["sh", "-c", "sleep infinity"]
