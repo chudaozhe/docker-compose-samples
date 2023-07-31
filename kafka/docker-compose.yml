@@ -1,0 +1,70 @@
+version: "3.4"
+# 使用外部网络
+# docker network create server_web-network
+networks:
+  server_web-network:
+    external: true
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.7.0
+    restart: always
+    tty: true
+    volumes:
+      - ../apps/zookeeper/data:/bitnami
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    networks:
+      - server_web-network
+
+  kafka:
+    image: bitnami/kafka:3.1.0
+    restart: always
+    tty: true
+    volumes:
+      - ./kafka/config/server.properties:/opt/bitnami/kafka/config/server.properties
+      - ./kafka/config/consumer.properties:/opt/bitnami/kafka/config/consumer.properties
+      - ./kafka/config/producer.properties:/opt/bitnami/kafka/config/producer.properties
+      - ../apps/kafka/data:/bitnami/kafka/data
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9092:9092"
+    networks:
+      - server_web-network
+
+  logikm:
+#    didi
+    image: chudaozhe/logikm:v2.6.0
+    restart: always
+    tty: true
+    volumes:
+      - ./logikm/application-docker.yml:/opt/application-docker.yml
+      - ../log/logikm:/opt/logs
+    environment:
+      - LOGI_MYSQL_HOST=docker-mysql
+      - LOGI_MYSQL_PORT=3306
+      - LOGI_MYSQL_DATABASE=logi_kafka_manager
+      - LOGI_MYSQL_USER=root
+      - LOGI_MYSQL_PASSWORD=
+    ports:
+      - "8088:8080"
+    networks:
+      - server_web-network
+
+#  kafka-manager:
+##    yahoo
+#    image: "kafkamanager/kafka-manager:3.0.0.4"
+#    restart: always
+#    tty: true
+#    volumes:
+#      - ./kafka-manager/conf/application.conf:/opt/cmak-3.0.0.4/conf/application.conf
+#    environment:
+#      - "ZK_HOSTS=zookeeper:2181"
+#    ports:
+#      - "8099:9000"
+#    networks:
+#      - server_web-network
