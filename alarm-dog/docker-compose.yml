@@ -13,6 +13,7 @@ services:
 #      - "9501:9501"
     volumes:
       - ./alarm-dog-admin/.env:/opt/www/.env
+    restart: always
     networks:
       - server_web-network
 
@@ -25,6 +26,7 @@ services:
     volumes:
       - ./docker/fe/nginx/conf.d:/etc/nginx/conf.d:rw
       - ./docker/fe/nginx/logs:/var/log/nginx:rw
+    restart: always
     networks:
       - server_web-network
 
@@ -34,6 +36,7 @@ services:
     image: chudaozhe/alarm-dog-api:1.0.0-v1.0
     volumes:
       - ./alarm-dog-api/.env:/opt/www/.env
+    restart: always
     networks:
       - server_web-network
 
@@ -41,6 +44,7 @@ services:
     image: chudaozhe/alarm-dog-consumer:1.0.0-v1.0
     volumes:
       - ./alarm-dog-consumer/.env:/opt/www/.env
+    restart: always
     networks:
       - server_web-network
 
@@ -48,6 +52,7 @@ services:
     image: chudaozhe/alarm-dog-monitor:1.0.0-v1.0
     volumes:
       - ./alarm-dog-monitor/.env:/opt/www/.env
+    restart: always
     networks:
       - server_web-network
 
@@ -66,5 +71,6 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+    restart: always
     networks:
       - server_web-network
