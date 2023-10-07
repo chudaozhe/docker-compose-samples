@@ -1,0 +1,36 @@
+version: "3"
+services:
+  cesi-backend:
+    container_name: cesi-backend
+    restart: on-failure
+    image: registry.cn-hangzhou.aliyuncs.com/cuiw/cesi:backend-v1.0
+    environment:
+      - CESI_CONFIG_PATH=/etc/cesi.conf.toml
+    volumes:
+      - "./cesi.conf.toml:/etc/cesi.conf.toml"
+    ports:
+      - ${CESI_BACKEND_PORT}:5000
+    depends_on:
+      - docker-php-fpm
+
+  cesi-frontend:
+    container_name: cesi-frontend
+    restart: on-failure
+    image: registry.cn-hangzhou.aliyuncs.com/cuiw/cesi:frontend-v1.0
+    stdin_open: true
+    ports:
+      - "${CESI_UI_PORT}:3000"
+    depends_on:
+      - cesi-backend
+
+  docker-php-fpm:
+    image: registry.cn-hangzhou.aliyuncs.com/cuiw/php:v1-supervisor
+    hostname: php-fpm
+    ports:
+      - 9001:9001 #supervisor
+    restart: always
+    tty: true
+    volumes:
+      - ./php-fpm/etc/supervisor:/etc/supervisor
+      - ./php-fpm/www:/var/www
+      - ./log/supervisor:/var/log/supervisor
