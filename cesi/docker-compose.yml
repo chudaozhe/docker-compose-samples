@@ -27,7 +27,7 @@ services:
     image: registry.cn-hangzhou.aliyuncs.com/cuiw/php:v1-supervisor
     hostname: php-fpm
     ports:
-      - 9001:9001 #supervisor
+      - 9002:9001 #supervisor
     restart: always
     tty: true
     volumes:
