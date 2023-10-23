@@ -18,7 +18,7 @@ services:
       - server_web-network
 
   fe:
-    image: chudaozhe/alarm-dog-fe:1.0.0-v1.0
+    image: chudaozhe/alarm-dog-fe:1.0.0-v1.1
     ports:
       - "8081:8081"
       - "8082:8082"
