@@ -6,12 +6,7 @@
 ## 开始使用
 
 ```
-# 拉取子模块
-git clone https://github.com/tal-tech/alarm-dog.git --recursive
-
-# 根据实际情况修改 docker-compose.yml 中以下参数
-VUE_APP_STATIC_PREFIX=//127.0.0.1:8081/admin/
-VUE_APP_BASE_API=//127.0.0.1:8081/api/
+# 根据实际情况修改各目录中的 .env 文件，其中 alarm-dog-fe 需要重新构建，步骤详见alarm-dog-fe/README.md
 
 # 启动docker
 docker-compose up -d
@@ -31,6 +26,7 @@ clickhouse-client
 create database alarm_dog;
 use alarm_dog;
 source clickhouse.sql;
+#或者把sql去掉空格，换行，然后加分号，最后复制sql粘贴执行
 ```
 
 默认账号：admin 密码：alarm-dog
