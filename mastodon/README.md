@@ -2,7 +2,7 @@
 
 ## 开始之前
 
-准备一个域名和证书，有服务器更好，没有也行
+准备一个域名和证书
 
 - 域名：`test.cuiwei.net`
 - 证书：`test.cuiwei.net.key`、`test.cuiwei.net.pem`
@@ -43,6 +43,7 @@ create database mastodon owner mastodon encoding UTF8;
 ![169908382556411.jpg](https://www.cuiwei.net/data/upload/2023-11-04/169908382556411.jpg)
 
 最后是导入数据，和创建管理员用户
+
 ![169908382571691.jpg](https://www.cuiwei.net/data/upload/2023-11-04/169908382571691.jpg)
 
 
