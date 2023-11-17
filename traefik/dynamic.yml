@@ -1,0 +1,20 @@
+# 动态配置文件
+# https://doc.traefik.io/traefik/reference/dynamic-configuration/file/
+http:
+  routers:
+    traefik-dashboard:
+      entrypoints: "http"
+      rule: "Host(`traefik.console.lab.io`)"
+      service: "dashboard@internal"
+    traefik-dashboard-api:
+      entrypoints: "http"
+      rule: "Host(`traefik.console.lab.io`) && PathPrefix(`/api`)"
+      service: "api@internal"
+    whoami-router:
+      rule: "Host(`whoami.docker.localhost`) || PathPrefix(`/whoami`)"
+      service: "whoami-service"
+  services:
+    whoami-service:
+      loadBalancer:
+        servers:
+          - url: "http://whoami:80"
