@@ -23,6 +23,7 @@ services:
     ports:
       # The HTTP port
       - "80:80"
+      - "443:443"
       # The Web UI (enabled by --api.insecure=true)
       # - "8080:8080"
     volumes:
@@ -30,6 +31,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik.yml:/etc/traefik/traefik.yml
       - ./dynamic.yml:/etc/traefik/dynamic.yml
+      - ./ssl:/etc/traefik/ssl
     networks:
       - web-network
 
@@ -38,5 +40,17 @@ services:
     image: traefik/whoami:v1.10.1
 #    labels:
 #      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`) || PathPrefix(`/whoami`)"
+    networks:
+      - web-network
+
+  test:
+    image: nginx:1.21.3
+    labels:
+      - "traefik.http.routers.test.entrypoints=http"
+      - "traefik.http.routers.test.rule=Host(`test.cuiwei.net`)"
+
+      - "traefik.http.routers.test-secure.entrypoints=https"
+      - "traefik.http.routers.test-secure.tls=true"
+      - "traefik.http.routers.test-secure.rule=Host(`test.cuiwei.net`)"
     networks:
       - web-network

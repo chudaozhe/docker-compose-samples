@@ -1,5 +1,20 @@
 # 动态配置文件
 # https://doc.traefik.io/traefik/reference/dynamic-configuration/file/
+tls:
+  certificates:
+    - certFile: /etc/traefik/ssl/test.cuiwei.net.pem
+      keyFile: /etc/traefik/ssl/test.cuiwei.net.key
+      stores:
+        - default
+    # Note that since no store is defined,
+    # the certificate below will be stored in the `default` store.
+#    - certFile: /path/to/other-domain.cert
+#      keyFile: /path/to/other-domain.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/ssl/test.cuiwei.net.pem
+        keyFile: /etc/traefik/ssl/test.cuiwei.net.key
 http:
   routers:
     traefik-dashboard:
@@ -18,3 +33,4 @@ http:
       loadBalancer:
         servers:
           - url: "http://whoami:80"
+          - url: "http://test:80"
