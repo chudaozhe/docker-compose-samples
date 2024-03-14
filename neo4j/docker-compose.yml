@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  neo4j:
+    image: neo4j:5.16.0
+    volumes:
+      - ./data/data:/data:rw
+      - ./data/logs:/logs:rw
+      - ./data/conf:/var/lib/neo4j/conf:rw
+      - ./data/import:/var/lib/neo4j/import:rw
+      - ./data/plugins:/plugins:rw
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_dbms_security_auth__minimum__password__length=6
+      - NEO4J_server_memory_heap_max__size=513M
+      - NEO4J_AUTH=neo4j/123456
+#      - NEO4J_AUTH=none
