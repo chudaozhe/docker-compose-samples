@@ -32,5 +32,5 @@ http:
     whoami-service:
       loadBalancer:
         servers:
-          - url: "http://whoami:80"
-          - url: "http://test:80"
+          - url: "http://whoami:80/"
+          - url: "http://test:80/"
