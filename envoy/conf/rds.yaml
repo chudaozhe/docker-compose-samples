@@ -1,0 +1,12 @@
+resources:
+  - '@type': type.googleapis.com/envoy.config.route.v3.RouteConfiguration
+    name: http-route
+    virtual_hosts:
+      - name: http-route
+        domains: ["*"]
+        routes:
+          - match:
+              prefix: "/"
+            route:
+              timeout: 15s
+              cluster: targetCluster

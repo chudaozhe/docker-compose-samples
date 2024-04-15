@@ -1,0 +1,30 @@
+# envoy-dynamic.yaml
+node:
+  id: envoy_web_id
+  cluster: envoy_web_cluster
+
+admin:
+  access_log_path: /tmp/admin_access.log
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
+
+dynamic_resources: # 动态配置
+  lds_config:
+    path: "/etc/envoy/lds.yaml"
+  cds_config:
+    path: "/etc/envoy/cds.yaml"
+
+#clusters:
+#  - name: targetCluster
+#    connect_timeout: 0.25s
+#    lb_policy: ROUND_ROBIN
+#    type: EDS
+#    eds_cluster_config:
+#      service_name: localservices # 可选，代替集群的名称，提供给 EDS 服务
+#      eds_config: # 集群的 EDS 更新源配置
+#        path_config_source: # 本地文件配置源
+#          path: "/etc/envoy/eds.yaml"
+#          # watched_directory: # 可选，监视目录中的文件更改
+#          #   path: "/etc/envoy"

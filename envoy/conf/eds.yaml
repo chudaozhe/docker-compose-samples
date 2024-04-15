@@ -1,0 +1,10 @@
+resources:
+  - "@type": type.googleapis.com/envoy.config.endpoint.v3.ClusterLoadAssignment
+    cluster_name: localservices # 集群的名称，如果在集群 eds_cluster_config 中指定，这将是 service_name 值。
+    endpoints:
+      - lb_endpoints:
+          - endpoint:
+              address:
+                socket_address:
+                  address: 172.21.0.2
+                  port_value: 80

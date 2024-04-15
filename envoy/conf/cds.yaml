@@ -1,0 +1,12 @@
+# 包含eds
+resources:
+  - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: targetCluster
+    connect_timeout: 0.25s
+    lb_policy: ROUND_ROBIN
+    type: EDS
+    eds_cluster_config:
+      service_name: localservices
+      eds_config:
+        path_config_source: # 本地文件配置源
+          path: "/etc/envoy/eds.yaml"

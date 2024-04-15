@@ -1,0 +1,21 @@
+version: "3.7"
+
+networks:
+  web-network:
+
+services:
+  envoy:
+    image: envoyproxy/envoy:v1.29.1
+    restart: unless-stopped
+    ports:
+      - "9901:9901"
+      - "10000:10000"
+    volumes:
+      - ./conf:/etc/envoy
+    networks:
+      - web-network
+
+  test:
+    image: nginx:1.21.3
+    networks:
+      - web-network
