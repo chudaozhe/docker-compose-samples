@@ -1,0 +1,19 @@
+version: "3.7"
+
+networks:
+  web-network:
+
+services:
+  lobe-chat:
+    image: lobehub/lobe-chat:v0.133.0
+    container_name: lobe-chat
+    restart: unless-stopped
+    ports:
+      - '3210:3210'
+#    env_file: .env
+    environment:
+      OPENAI_API_KEY: sk-xxxx
+      OPENAI_PROXY_URL: https://api-proxy.com/v1
+      ACCESS_CODE: lobe66
+    networks:
+      - web-network

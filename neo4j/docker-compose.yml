@@ -1,4 +1,8 @@
-version: "3.7"
+version: "3.9"
+networks:
+  ollama_ollama-network:
+    external: true
+
 services:
   neo4j:
     image: neo4j:5.16.0
@@ -16,4 +20,9 @@ services:
       - NEO4J_dbms_security_auth__minimum__password__length=6
       - NEO4J_server_memory_heap_max__size=513M
       - NEO4J_AUTH=neo4j/123456
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_db_tx__log_rotation_retention__policy=false
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
 #      - NEO4J_AUTH=none
+    networks:
+      - ollama_ollama-network
