@@ -23,7 +23,7 @@ services:
     image: registry.cn-hangzhou.aliyuncs.com/cuiw/fluentd:v1.9-1
     container_name: fluentd
     hostname: fluentd
-    restart: always
+    restart: unless-stopped
     tty: true
     volumes:
       - ./fluentd/conf:/fluentd/etc
@@ -47,14 +47,13 @@ services:
 #      - server_web-network
 
   elasticsearch:
-    image: elasticsearch:7.17.0
+    image: elasticsearch:8.12.2
     container_name: elasticsearch
     hostname: elasticsearch
-    restart: always
+    restart: unless-stopped
     tty: true
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
       - ./elasticsearch/data:/usr/share/elasticsearch/data:rw
       - ./elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -67,10 +66,10 @@ services:
       - server_web-network
 
   kibana:
-    image: kibana:7.17.0
+    image: kibana:8.12.2
     container_name: kibana
     hostname: kibana
-    restart: always
+    restart: unless-stopped
     tty: true
 #    environment:
 #      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
@@ -82,10 +81,10 @@ services:
       - server_web-network
 
   logstash:
-    image: logstash:7.17.0
+    image: logstash:8.12.2
     container_name: logstash
     hostname: logstash
-    restart: always
+    restart: unless-stopped
     tty: true
     environment:
       LS_JAVA_OPTS: "-Xms512m -Xmx512m"
