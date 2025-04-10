@@ -6,7 +6,7 @@ networks:
 services:
 
   confluence:
-    image: confluence-server:8.5.0-m05-jdk11-1.0
+    image: confluence-server:8.5.6-jdk17-1.0
     container_name: confluence
     hostname: confluence
     ports:
@@ -15,12 +15,12 @@ services:
     tty: true
     volumes:
       - ./confluence/data:/var/atlassian/application-data/confluence
-      - ./confluence/mysql-connector-j-8.0.31.jar:/opt/atlassian/confluence/confluence/WEB-INF/lib/mysql-connector-j-8.0.31.jar
+      - ./mysql-connector-j-8.0.31.jar:/opt/atlassian/confluence/confluence/WEB-INF/lib/mysql-connector-j-8.0.31.jar
     networks:
       - web-network
 
   jira-core:
-    image: jira-core:9.4.0-jdk11-1.0
+    image: jira-core:9.12.20-1.0
     container_name: jira-core
     hostname: jira-core
     ports:
@@ -29,7 +29,7 @@ services:
     tty: true
     volumes:
       - ./jira/data:/var/atlassian/application-data/jira
-      - ./jira/mysql-connector-j-8.0.31.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/mysql-connector-j-8.0.31.jar
+      - ./mysql-connector-j-8.0.31.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/mysql-connector-j-8.0.31.jar
     networks:
       - web-network
 
