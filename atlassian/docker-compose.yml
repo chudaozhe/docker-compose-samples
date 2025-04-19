@@ -11,7 +11,7 @@ services:
     hostname: confluence
     ports:
       - "8090:8090"
-    restart: always
+    restart: unless-stopped
     tty: true
     volumes:
       - ./confluence/data:/var/atlassian/application-data/confluence
@@ -25,7 +25,7 @@ services:
     hostname: jira-core
     ports:
       - "8081:8080"
-    restart: always
+    restart: unless-stopped
     tty: true
     volumes:
       - ./jira/data:/var/atlassian/application-data/jira
@@ -36,7 +36,7 @@ services:
   docker-mysql:
     image: mysql:8.0.26
     hostname: mysql
-    restart: always
+    restart: unless-stopped
     tty: true
     volumes:
       - ./mysql/my.cnf:/etc/my.cnf

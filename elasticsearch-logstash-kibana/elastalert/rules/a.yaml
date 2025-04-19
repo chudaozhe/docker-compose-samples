@@ -1,0 +1,51 @@
+name: "a"
+type: "any"
+index: "site-log-*"
+is_enabled: true
+realert:
+  seconds: 0
+timestamp_field: "@timestamp"
+timestamp_type: "iso"
+use_strftime_index: false
+#alert_subject: "Test {} 123 aa☃"
+#alert_subject_args:
+#  - "message"
+#  - "@log_name"
+#alert_text: "Test {}  123 bb☃"
+#alert_text_args:
+#  - "site"
+filter:
+  - terms:
+      type:
+        - exception
+        - http_log
+        - event
+  - query:
+      query_string:
+        query: "@timestamp:*"
+alert:
+  - "elastalert_modules.feishu_alert.FeishuAlert"
+#include: #读取es索引中的部分字段
+#  - "@timestamp"
+#  - "_index"
+#  - "site"
+#  - "app"
+#  - "type"
+#slack_webhook_url: 'https://hooks.slack.com/services/T057QKB3EJW/B08LJB3RGQM/N8PXEBWou5j6l6FeRC0000'
+#slack_channel_override: "#abc"
+#slack_emoji_override: ":kissing_cat:"
+#slack_msg_color: "warning"
+#slack_parse_override: "none"
+#slack_username_override: "elastalert"
+
+#lark_bot_id: "e7334c7d-3108-49f3-bd61-0000"
+#lark_msgtype: "text"
+
+#测试
+feishualert_botid: "e7334c7d-3108-49f3-bd61-0000"
+feishualert_body: |
+  {feishualert_message}
+  站点: {site}
+  应用名称: {app}
+  类型: {type}
+  触发时间: {feishualert_time}

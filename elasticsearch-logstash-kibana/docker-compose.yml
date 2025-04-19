@@ -1,5 +1,3 @@
-version: '3'
-
 # 使用外部网络
 # docker network create server_web-network
 networks:
@@ -47,7 +45,7 @@ services:
 #      - server_web-network
 
   elasticsearch:
-    image: elasticsearch:8.12.2
+    image: elasticsearch:8.17.4
     container_name: elasticsearch
     hostname: elasticsearch
     restart: unless-stopped
@@ -57,6 +55,7 @@ services:
     volumes:
       - ./elasticsearch/data:/usr/share/elasticsearch/data:rw
       - ./elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/certificates/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
       - ./elasticsearch/logs:/usr/share/elasticsearch/logs:rw
       - ./elasticsearch/backup:/usr/share/elasticsearch/backup:rw
       - ./elasticsearch/plugins:/usr/share/elasticsearch/plugins:rw
@@ -65,8 +64,20 @@ services:
     networks:
       - server_web-network
 
+  elastic-connectors:
+    image: elastic/elastic-connectors:8.17.4
+    container_name: elastic-connectors
+    hostname: elastic-connectors
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./connectors-config:/config
+    command: /app/bin/elastic-ingest -c /config/config.yml
+    networks:
+      - server_web-network
+
   kibana:
-    image: kibana:8.12.2
+    image: kibana:8.17.4
     container_name: kibana
     hostname: kibana
     restart: unless-stopped
@@ -77,11 +88,13 @@ services:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - 5601:5601
+    user: root
+    command: ["kibana", "--allow-root"]
     networks:
       - server_web-network
 
   logstash:
-    image: logstash:8.12.2
+    image: logstash:8.17.4
     container_name: logstash
     hostname: logstash
     restart: unless-stopped
@@ -91,9 +104,42 @@ services:
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
       - ./logstash/patterns:/usr/share/logstash/patterns
-      - ../log/nginx:/var/log/nginx
+      - ./nginx_log:/var/log/nginx
+      - ./site_log:/var/log/site_log
+      - ./logstash/GeoLite2-City.mmdb:/usr/share/logstash/GeoLite2-City.mmdb
     ports:
       - 5044:5044
-      - 8099:8099
+      - 8099:8099 #Http 输入
+    networks:
+      - server_web-network
+
+  elastalert:
+    image: jertel/elastalert2:2.23.0
+    container_name: elastalert
+    hostname: elastalert
+    restart: unless-stopped
+    tty: true
+    environment:
+      TZ: "Asia/Shanghai"
+    volumes:
+      - ./elastalert/elastalert.yaml:/opt/elastalert/config.yaml
+      - ./elastalert/rules:/opt/elastalert/rules
+      - ./elastalert/elastalert_modules:/opt/elastalert/elastalert_modules
+    command: --verbose
+    networks:
+      - server_web-network
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    tty: true
+    environment:
+      TZ: "Asia/Shanghai"
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/conf/sample.ini:/usr/share/grafana/conf/sample.ini
     networks:
       - server_web-network

@@ -1,6 +1,6 @@
-/elasticsearch/backup
 /elasticsearch/data
 /elasticsearch/plugins
+/elasticsearch/logs
 /log
 /php/www/vendor
 /php/www/composer.lock

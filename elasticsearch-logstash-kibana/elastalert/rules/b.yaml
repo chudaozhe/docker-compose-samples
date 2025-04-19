@@ -1,0 +1,29 @@
+name: "b"
+type: "frequency"
+index: "test123-*"
+is_enabled: true
+num_events: 2
+realert:
+  minutes: 5
+timeframe:
+  minutes: 5
+timestamp_field: "@timestamp"
+timestamp_type: "iso"
+use_strftime_index: false
+alert_subject: "Test {} 123 aa☃"
+alert_subject_args:
+  - "message"
+  - "@log_name"
+alert_text: "Test {}  123 bb☃"
+alert_text_args:
+  - "site"
+filter:
+  - query:
+      query_string:
+        query: "@timestamp:*"
+alert:
+#  - "slack"
+  - "lark"
+
+lark_bot_id: "e7334c7d-3108-49f3-bd61-0000"
+lark_msgtype: "text"

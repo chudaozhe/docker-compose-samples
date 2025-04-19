@@ -7,3 +7,6 @@ monitoring.ui.container.elasticsearch.enabled: true
 i18n.locale: "zh-CN"
 elasticsearch.username: "kibana_system"
 elasticsearch.password: "es123456"
+xpack.encryptedSavedObjects.encryptionKey: 27bcf13b552f2cdff57102a942b271a6
+xpack.reporting.encryptionKey: 3a1d4358ef9f7965d4095dbc3d6c6986
+xpack.security.encryptionKey: 45e47452ca6f12f24011e8e15f6e2e7f
